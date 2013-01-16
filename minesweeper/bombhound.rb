@@ -1,3 +1,5 @@
+require 'yaml'
+
 class Board
   attr_accessor :board
 
@@ -10,14 +12,16 @@ class Board
   end
 
   def play
-    puts "Do you want a (1) 9 x 9 grid or (2) 16 x 16 grid"
-    grid_number = gets.chomp.to_i
-    if grid_number == 1
-      initialize_play(9)
-    else
-      initialize_play(16)
+    if @board.nil?
+      puts "Do you want a (1) 9 x 9 grid or (2) 16 x 16 grid" 
+      grid_number = gets.chomp.to_i
+      if grid_number == 1
+        initialize_play(9)
+      else
+        initialize_play(16)
+      end
+      create_board
     end
-    create_board
 
     until win?
       print_board
@@ -31,6 +35,15 @@ class Board
           break
         else
           reveal_location(location)
+        end
+      elsif player_move[0] == 'q'
+        puts "You are about to quit, save board? (y/n)"
+        input = gets.chomp.downcase
+        if input[0] == 'y'
+          save
+          Kernel::exit
+        else
+          Kernel::exit
         end
       else
         if @board[location].flagged
@@ -118,8 +131,10 @@ class Board
 
   # Checks if player inputs a valid move
   def valid?(tile_choice)
-    if tile_choice[0] == "r" || tile_choice[0] == "f"
-      if @board[tile_choice[1..2]]
+    if tile_choice[0] == "r" || tile_choice[0] == "f" ||  tile_choice[0] == "q"
+      if tile_choice[0] == 'q'
+        return true
+      elsif @board[tile_choice[1..2]]
         return true
       end
     end
@@ -204,6 +219,15 @@ class Board
   def prune_nearby_locations(nearby_locations)
     nearby_locations.select { |loc| @board[loc]}
   end
+
+  def save
+    puts "What would you like to call your game?"
+    game_name = gets.chomp.downcase
+    saved_game = self.to_yaml
+    File.open("#{game_name}.yaml", "w") do |f|
+      f.puts saved_game
+    end
+  end
 end
 
 class Tile
@@ -248,3 +272,14 @@ class Tile
     end
   end
 end
+
+game = Board.new
+puts "Welcome to Bomb Hound... ready to sniff out some bombs?"
+puts "Do you want to load a previous game?"
+previous_game = gets.chomp.downcase
+if previous_game[0] == 'y'
+  puts "Which file?"
+  file = gets.chomp
+  File.open("#{file}.yaml") { |yf| game = YAML::load(yf) }
+end
+game.play
