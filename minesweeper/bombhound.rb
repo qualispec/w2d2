@@ -4,7 +4,7 @@ class Board
   attr_accessor :board
 
   def initialize_play(num)
-    @rows = num - 1
+    @rows = num - 1         #Vincent - you could combine this as @rows, @columns = num - 1, num - 1 to save a line
     @columns = num - 1
     @bomb_number = num_bombs(num)
     @board = {}
@@ -39,14 +39,14 @@ class Board
       elsif player_move[0] == 'q'
         puts "You are about to quit, save board? (y/n)"
         input = gets.chomp.downcase
-        if input[0] == 'y'
+        if input[0] == 'y'        #Vincent - couldn't this simply have been if input == 'y'?
           save
           Kernel::exit
         else
           Kernel::exit
         end
-      else
-        if @board[location].flagged
+      else        #Vincent - it'd still probably be better to check for a real 'f' or 'u' input for flag/unflag
+        if @board[location].flagged     # to guard against garbage input causing the game to flag/unflag a tile.
           @board[location].unflag
         else
           @board[location].flag
@@ -54,10 +54,10 @@ class Board
       end
     end
 
-    puts "Congrats! You've won" if win?
+    puts "Congrats! You've won" if win?   #Vincent - you don't need the 'if win?' here, redundant.
     puts "Play again? (y/n)"
     input = gets.chomp.downcase
-    if input[0] == 'y'
+    if input[0] == 'y'      #Vincent - couldn't this simply have been if input == 'y'?
       play
     else
       puts "Thanks for playing!"
@@ -118,8 +118,8 @@ class Board
   def get_player_move
     puts "Make your move - (f)lag/(r)eveal followed by #row #column."
     puts "Example: r 3 4"
-    tile_choice = gets.chomp.downcase.split(" ")
-    tile_choice[1..2] = tile_choice[1..2].map(&:to_i)
+    tile_choice = gets.chomp.downcase.split(" ")  #Vincent - 'tile_choice' is somewhat of an awkward variable name here because it store both the action desired and the tile.
+    tile_choice[1..2] = tile_choice[1..2].map(&:to_i) #Vincent - you could just use map! operator here
 
     if valid?(tile_choice)
       tile_choice
@@ -143,7 +143,7 @@ class Board
 
   def num_bombs(num)
     case num
-    when 4 then 1
+    when 4 then 1     #Vincent - when does case num = 4 ever happen?
     when 9 then 10
     when 16 then 40
     end
@@ -204,7 +204,7 @@ class Board
     row, column = location
     nearby_locations = []
     r = -1
-    until r == 2
+    until r == 2        #Vincent - you could also do (-1..1).each do here to get rid of the explicit r += and c += 1 iterators.
       c = -1
       until c == 2
         nearby_locations << [row + r, column + c] unless r == 0 && c == 0
@@ -231,14 +231,14 @@ class Board
 end
 
 class Tile
-  attr_accessor :flagged, :showing, :nearby_tiles, :checked
+  attr_accessor :flagged, :showing, :nearby_tiles, :checked   #Vincent - I can't see where :checked is ever used!
   attr_reader :bomb, :nearby_bombs
 
   def initialize(location, bomb=false)
     @location = location
     @bomb = bomb
     @flagged = false
-    @showing = false
+    @showing = false          #Vincent - 'showing' is kind of an inconsistent variable...you could call it 'revealed' to be more consistent.
     @nearby_tiles = []
   end
 
