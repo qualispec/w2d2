@@ -57,7 +57,7 @@ class Board
     puts "Congrats! You've won" if win?   #Vincent - you don't need the 'if win?' here, redundant.
     puts "Play again? (y/n)"
     input = gets.chomp.downcase
-    if input[0] == 'y'      #Vincent - couldn't this simply have been if input == 'y'?
+    if input[0] == 'y'        #Vincent - couldn't this simply have been if input == 'y'?
       play
     else
       puts "Thanks for playing!"
